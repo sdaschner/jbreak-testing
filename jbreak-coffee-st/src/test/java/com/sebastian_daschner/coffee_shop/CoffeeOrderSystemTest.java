@@ -12,46 +12,46 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CoffeeOrderSystemTest {
 
     @Rule
-    public CoffeeShop coffeeShop = new CoffeeShop();
+    public CoffeeShopSystem coffeeShopSystem = new CoffeeShopSystem();
 
     @Rule
-    public Processor processor = new Processor();
+    public ProcessorSystem processorSystem = new ProcessorSystem();
 
     @Test
     public void createVerifyOrder() {
-        List<URI> originalOrders = coffeeShop.getOrders();
+        List<URI> originalOrders = coffeeShopSystem.getOrders();
 
         Order order = new Order("Espresso", "Colombia");
-        URI orderUri = coffeeShop.createOrder(order);
+        URI orderUri = coffeeShopSystem.createOrder(order);
 
-        Order loadedOrder = coffeeShop.getOrder(orderUri);
+        Order loadedOrder = coffeeShopSystem.getOrder(orderUri);
         assertThat(loadedOrder).isEqualToComparingOnlyGivenFields(order, "type", "origin");
 
-        assertThat(coffeeShop.getOrders()).hasSize(originalOrders.size() + 1);
+        assertThat(coffeeShopSystem.getOrders()).hasSize(originalOrders.size() + 1);
     }
 
     @Test
     public void createOrderCheckStatusUpdate() {
         Order order = new Order("Espresso", "Colombia");
-        URI orderUri = coffeeShop.createOrder(order);
+        URI orderUri = coffeeShopSystem.createOrder(order);
 
-        processor.answerForId(orderUri, "PREPARING");
+        processorSystem.answerForId(orderUri, "PREPARING");
 
-        Order loadedOrder = coffeeShop.getOrder(orderUri);
+        Order loadedOrder = coffeeShopSystem.getOrder(orderUri);
         assertThat(loadedOrder).isEqualToComparingOnlyGivenFields(order, "type", "origin");
 
         loadedOrder = waitForProcessAndGet(orderUri, "PREPARING");
         assertThat(loadedOrder.getStatus()).isEqualTo("Preparing");
 
-        processor.answerForId(orderUri, "FINISHED");
+        processorSystem.answerForId(orderUri, "FINISHED");
 
         loadedOrder = waitForProcessAndGet(orderUri, "FINISHED");
         assertThat(loadedOrder.getStatus()).isEqualTo("Finished");
     }
 
     private Order waitForProcessAndGet(URI orderUri, String requestedStatus) {
-        processor.waitForInvocation(orderUri, requestedStatus);
-        return coffeeShop.getOrder(orderUri);
+        processorSystem.waitForInvocation(orderUri, requestedStatus);
+        return coffeeShopSystem.getOrder(orderUri);
     }
 
 }

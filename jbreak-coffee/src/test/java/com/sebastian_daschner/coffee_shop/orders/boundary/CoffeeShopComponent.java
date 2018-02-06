@@ -7,7 +7,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -27,8 +26,9 @@ public class CoffeeShopComponent extends CoffeeShop {
     }
 
     public void answerForUnfinishedOrders(List<Order> orders) {
-        TypedQuery queryMock = mock(TypedQuery.class);
-        when(entityManager.createNamedQuery(anyString(), any())).thenReturn(queryMock);
+        @SuppressWarnings("unchecked")
+        TypedQuery<Order> queryMock = mock(TypedQuery.class);
+        when(entityManager.createNamedQuery(anyString(), Order.class)).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(orders);
     }
 }

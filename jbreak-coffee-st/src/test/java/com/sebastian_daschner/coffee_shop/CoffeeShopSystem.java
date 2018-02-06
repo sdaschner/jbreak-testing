@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CoffeeShop extends ExternalResource {
+public class CoffeeShopSystem extends ExternalResource {
 
     private static final int STARTUP_TIMEOUT = 30;
     private static final int STARTUP_PING_DELAY = 2;

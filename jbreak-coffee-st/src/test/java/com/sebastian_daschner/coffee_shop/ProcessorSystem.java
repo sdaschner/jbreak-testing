@@ -19,7 +19,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Collections.singletonMap;
 import static java.util.Comparator.comparing;
 
-public class Processor extends ExternalResource {
+public class ProcessorSystem extends ExternalResource {
 
     private final Map<URI, Set<String>> requestedStatuses = new HashMap<>();
 
