@@ -1,24 +1,24 @@
 package com.sebastian_daschner.coffee_shop.orders.boundary;
 
 import com.sebastian_daschner.coffee_shop.orders.entity.CoffeeType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CoffeeShopTest {
+class CoffeeShopTest {
 
     private CoffeeShop cut;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cut = new CoffeeShop();
     }
 
     @Test
-    public void testGetCoffeeTypes() {
+    void testGetCoffeeTypes() {
         final Set<CoffeeType> coffeeTypes = cut.getCoffeeTypes();
         assertThat(coffeeTypes).hasSize(3);
         assertThat(coffeeTypes).containsOnly(CoffeeType.ESPRESSO, CoffeeType.LATTE, CoffeeType.POUR_OVER);

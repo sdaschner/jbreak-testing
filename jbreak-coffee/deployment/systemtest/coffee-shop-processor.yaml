@@ -27,3 +27,19 @@ spec:
         image: rodolpheche/wiremock:2.6.0
         imagePullPolicy: IfNotPresent
       restartPolicy: Always
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: coffee-processor
+  namespace: systemtest
+spec:
+  rules:
+    - host: coffee-processor.kubernetes.local
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: coffee-processor
+            servicePort: 8080
+---

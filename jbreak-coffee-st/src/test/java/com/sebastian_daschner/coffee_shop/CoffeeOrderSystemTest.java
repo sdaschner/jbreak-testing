@@ -1,24 +1,28 @@
 package com.sebastian_daschner.coffee_shop;
 
 import com.sebastian_daschner.coffee_shop.entity.Order;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CoffeeOrderSystemTest {
+class CoffeeOrderSystemTest {
 
-    @Rule
-    public CoffeeShopSystem coffeeShopSystem = new CoffeeShopSystem();
+    private CoffeeShopSystem coffeeShopSystem;
+    private ProcessorSystem processorSystem;
 
-    @Rule
-    public ProcessorSystem processorSystem = new ProcessorSystem();
+    @BeforeEach
+    void setUp() {
+        coffeeShopSystem = new CoffeeShopSystem();
+        processorSystem = new ProcessorSystem();
+    }
 
     @Test
-    public void createVerifyOrder() {
+    void createVerifyOrder() {
         List<URI> originalOrders = coffeeShopSystem.getOrders();
 
         Order order = new Order("Espresso", "Colombia");
@@ -31,7 +35,7 @@ public class CoffeeOrderSystemTest {
     }
 
     @Test
-    public void createOrderCheckStatusUpdate() {
+    void createOrderCheckStatusUpdate() {
         Order order = new Order("Espresso", "Colombia");
         URI orderUri = coffeeShopSystem.createOrder(order);
 
@@ -52,6 +56,11 @@ public class CoffeeOrderSystemTest {
     private Order waitForProcessAndGet(URI orderUri, String requestedStatus) {
         processorSystem.waitForInvocation(orderUri, requestedStatus);
         return coffeeShopSystem.getOrder(orderUri);
+    }
+
+    @AfterEach
+    void reset() {
+        processorSystem.reset();
     }
 
 }

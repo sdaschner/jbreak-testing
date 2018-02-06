@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.matching.StringValuePattern;
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import org.junit.rules.ExternalResource;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -19,17 +18,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Collections.singletonMap;
 import static java.util.Comparator.comparing;
 
-public class ProcessorSystem extends ExternalResource {
+public class ProcessorSystem {
 
     private final Map<URI, Set<String>> requestedStatuses = new HashMap<>();
 
-    @Override
-    protected void before() {
-        configureFor("192.168.99.100", 31425);
-        resetAllRequests();
+    public ProcessorSystem() {
+        configureFor("coffee-processor.kubernetes.local", 80);
+        reset();
 
-        stubFor(post("/coffee-processor/resources/processes")
-                .willReturn(jsonResponse("PREPARING")));
+        stubFor(post("/coffee-processor/resources/processes").willReturn(jsonResponse("PREPARING")));
     }
 
     public void answerForId(URI uri, String answer) {
@@ -97,8 +94,7 @@ public class ProcessorSystem extends ExternalResource {
         return object.getString("status");
     }
 
-    @Override
-    protected void after() {
+    public void reset() {
         resetAllRequests();
     }
 

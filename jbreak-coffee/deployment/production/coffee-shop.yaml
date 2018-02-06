@@ -33,3 +33,19 @@ spec:
       restartPolicy: Always
       imagePullSecrets:
       - name: regsecret
+---
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: jbreak-coffee
+  namespace: production
+spec:
+  rules:
+    - host: coffee-shop.kubernetes.local
+      http:
+        paths:
+        - path: /
+          backend:
+            serviceName: jbreak-coffee
+            servicePort: 8080
+---

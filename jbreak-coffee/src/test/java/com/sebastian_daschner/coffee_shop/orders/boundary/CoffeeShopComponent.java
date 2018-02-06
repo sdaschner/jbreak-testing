@@ -28,7 +28,7 @@ public class CoffeeShopComponent extends CoffeeShop {
     public void answerForUnfinishedOrders(List<Order> orders) {
         @SuppressWarnings("unchecked")
         TypedQuery<Order> queryMock = mock(TypedQuery.class);
-        when(entityManager.createNamedQuery(anyString(), Order.class)).thenReturn(queryMock);
+        when(entityManager.createNamedQuery(anyString(), eq(Order.class))).thenReturn(queryMock);
         when(queryMock.getResultList()).thenReturn(orders);
     }
 }

@@ -1,7 +1,6 @@
 package com.sebastian_daschner.coffee_shop;
 
 import com.sebastian_daschner.coffee_shop.entity.Order;
-import org.junit.rules.ExternalResource;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -19,15 +18,31 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CoffeeShopSystem extends ExternalResource {
+public class CoffeeShopSystem {
 
     private static final int STARTUP_TIMEOUT = 30;
     private static final int STARTUP_PING_DELAY = 2;
 
-    private String ordersUri = "http://192.168.99.100:30585/jbreak-coffee/resources/orders";
+    private String ordersUri = "http://coffee-shop.kubernetes.local/jbreak-coffee/resources/orders";
     private Pattern orderUriPattern = Pattern.compile(ordersUri + "/[a-z0-9\\-]+");
     private WebTarget ordersTarget;
     private Client client;
+
+    public CoffeeShopSystem() {
+        client = ClientBuilder.newClient();
+        ordersTarget = client.target(URI.create(ordersUri));
+        waitForApplicationStartUp();
+    }
+
+    private void waitForApplicationStartUp() {
+        final long timeout = System.currentTimeMillis() + STARTUP_TIMEOUT * 1000;
+        while (ordersTarget.request().head().getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+            System.out.println("waiting for application startup");
+            LockSupport.parkNanos(1_000_000_000 * STARTUP_PING_DELAY);
+            if (System.currentTimeMillis() > timeout)
+                throw new AssertionError("Application wasn't started before timeout!");
+        }
+    }
 
     public URI createOrder(Order order) {
         final Response response = postOrder(order);
@@ -79,23 +94,6 @@ public class CoffeeShopSystem extends ExternalResource {
         assertThat(orderUriPattern.matcher(location.toString()).matches())
                 .as("URI %s doesn't match pattern: %s", location, orderUriPattern.pattern())
                 .isTrue();
-    }
-
-    @Override
-    protected void before() throws Throwable {
-        client = ClientBuilder.newClient();
-        ordersTarget = client.target(URI.create(ordersUri));
-        waitForApplicationStartUp();
-    }
-
-    private void waitForApplicationStartUp() {
-        final long timeout = System.currentTimeMillis() + STARTUP_TIMEOUT * 1000;
-        while (ordersTarget.request().head().getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-            System.out.println("waiting for application startup");
-            LockSupport.parkNanos(1_000_000_000 * STARTUP_PING_DELAY);
-            if (System.currentTimeMillis() > timeout)
-                throw new AssertionError("Application wasn't started before timeout!");
-        }
     }
 
 }
