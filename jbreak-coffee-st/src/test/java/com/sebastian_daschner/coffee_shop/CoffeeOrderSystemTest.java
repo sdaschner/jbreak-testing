@@ -54,6 +54,7 @@ class CoffeeOrderSystemTest {
     }
 
     private Order waitForProcessAndGet(URI orderUri, String requestedStatus) {
+        System.out.println("waiting for orderUri = [" + orderUri + "], requestedStatus = [" + requestedStatus + "]");
         processorSystem.waitForInvocation(orderUri, requestedStatus);
         return coffeeShopSystem.getOrder(orderUri);
     }
