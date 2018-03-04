@@ -1,0 +1,9 @@
+== Create effective tests or create excuses -- testing the Java EE way
+
+Code examples of my presentation at jbreak 2018.
+
+For all of the attendes there is a discount on my book '`Architecting Modern Java EE Applications`'.
+The book covers the whole topic of enterprise testing.
+
+For the discount, go to https://www.packtpub.com/application-development/architecting-modern-java-ee-applications.
+There is a discount on the ebook for everybody and on the printed copy you can get a discount by applying the code `AMJEA10`.
