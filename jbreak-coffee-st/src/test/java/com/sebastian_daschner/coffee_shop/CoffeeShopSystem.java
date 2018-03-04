@@ -23,7 +23,7 @@ public class CoffeeShopSystem {
     private static final int STARTUP_TIMEOUT = 30;
     private static final int STARTUP_PING_DELAY = 2;
 
-    private String ordersUri = "http://coffee-shop.kubernetes.local/jbreak-coffee/resources/orders";
+    private String ordersUri = "http://coffee-shop.test.kubernetes.local/jbreak-coffee/resources/orders";
     private Pattern orderUriPattern = Pattern.compile(ordersUri + "/[a-z0-9\\-]+");
     private WebTarget ordersTarget;
     private Client client;

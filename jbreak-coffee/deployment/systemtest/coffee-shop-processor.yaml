@@ -35,7 +35,7 @@ metadata:
   namespace: systemtest
 spec:
   rules:
-    - host: coffee-processor.kubernetes.local
+    - host: coffee-processor.test.kubernetes.local
       http:
         paths:
         - path: /

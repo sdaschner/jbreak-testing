@@ -4,7 +4,7 @@
     <groupId>com.sebastian-daschner</groupId>
     <artifactId>jbreak-coffee-st</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>

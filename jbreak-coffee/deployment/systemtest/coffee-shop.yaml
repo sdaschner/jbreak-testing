@@ -41,7 +41,7 @@ metadata:
   namespace: systemtest
 spec:
   rules:
-    - host: coffee-shop.kubernetes.local
+    - host: coffee-shop.test.kubernetes.local
       http:
         paths:
         - path: /

@@ -2,7 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: jbreak-coffee
-  namespace: production
 spec:
   selector:
     app: jbreak-coffee
@@ -14,7 +13,6 @@ kind: Deployment
 apiVersion: apps/v1beta1
 metadata:
   name: jbreak-coffee
-  namespace: production
 spec:
   replicas: 1
   template:
@@ -38,7 +36,6 @@ kind: Ingress
 apiVersion: extensions/v1beta1
 metadata:
   name: jbreak-coffee
-  namespace: production
 spec:
   rules:
     - host: coffee-shop.kubernetes.local

@@ -20,10 +20,8 @@ import static java.util.Comparator.comparing;
 
 public class ProcessorSystem {
 
-    private final Map<URI, Set<String>> requestedStatuses = new HashMap<>();
-
     public ProcessorSystem() {
-        configureFor("coffee-processor.kubernetes.local", 80);
+        configureFor("coffee-processor.test.kubernetes.local", 80);
         reset();
 
         stubFor(post("/coffee-processor/resources/processes").willReturn(jsonResponse("PREPARING")));
@@ -50,7 +48,6 @@ public class ProcessorSystem {
     }
 
     public void waitForInvocation(URI orderUri, String requestedStatus) {
-        addRequestedStatus(orderUri, requestedStatus);
         final long timeout = System.currentTimeMillis() + 60_000;
 
         while (retrieveRequestedStatuses(orderUri, requestedStatus).isEmpty()) {
@@ -58,11 +55,6 @@ public class ProcessorSystem {
             if (System.currentTimeMillis() > timeout)
                 throw new AssertionError("Processing for order " + orderUri + " wasn't invoked within timeout!");
         }
-    }
-
-    private void addRequestedStatus(URI orderUri, String requestedStatus) {
-        requestedStatuses.computeIfAbsent(orderUri, c -> new HashSet<>())
-                .add(requestedStatus);
     }
 
     private List<String> retrieveRequestedStatuses(URI orderUri, String requestedStatus) {
