@@ -1,4 +1,4 @@
-package com.sebastian_daschner.coffee_shop.entity;
+package com.sebastian_daschner.coffee_shop;
 
 public class Order {
 
@@ -7,8 +7,7 @@ public class Order {
     private String origin;
     private String status;
 
-    private Order() {
-        // for jackson
+    public Order() {
     }
 
     public Order(String type, String origin) {
@@ -47,5 +46,4 @@ public class Order {
     public void setStatus(String status) {
         this.status = status;
     }
-
 }

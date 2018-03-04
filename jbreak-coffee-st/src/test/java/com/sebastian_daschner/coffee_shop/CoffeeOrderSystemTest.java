@@ -1,6 +1,5 @@
 package com.sebastian_daschner.coffee_shop;
 
-import com.sebastian_daschner.coffee_shop.entity.Order;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,51 +11,50 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CoffeeOrderSystemTest {
 
-    private CoffeeShopSystem coffeeShopSystem;
+    private CoffeeOrderSystem coffeeOrderSystem;
     private ProcessorSystem processorSystem;
 
     @BeforeEach
     void setUp() {
-        coffeeShopSystem = new CoffeeShopSystem();
+        coffeeOrderSystem = new CoffeeOrderSystem();
         processorSystem = new ProcessorSystem();
     }
 
     @Test
     void createVerifyOrder() {
-        List<URI> originalOrders = coffeeShopSystem.getOrders();
+        List<URI> originalOrders = coffeeOrderSystem.getOrders();
 
         Order order = new Order("Espresso", "Colombia");
-        URI orderUri = coffeeShopSystem.createOrder(order);
+        URI orderUri = coffeeOrderSystem.createOrder(order);
 
-        Order loadedOrder = coffeeShopSystem.getOrder(orderUri);
+        Order loadedOrder = coffeeOrderSystem.getOrder(orderUri);
         assertThat(loadedOrder).isEqualToComparingOnlyGivenFields(order, "type", "origin");
 
-        assertThat(coffeeShopSystem.getOrders()).hasSize(originalOrders.size() + 1);
+        assertThat(coffeeOrderSystem.getOrders()).hasSize(originalOrders.size() + 1);
     }
 
     @Test
     void createOrderCheckStatusUpdate() {
         Order order = new Order("Espresso", "Colombia");
-        URI orderUri = coffeeShopSystem.createOrder(order);
+        URI orderUri = coffeeOrderSystem.createOrder(order);
 
-        processorSystem.answerForId(orderUri, "PREPARING");
+        processorSystem.answerForOrder(orderUri, "PREPARING");
 
-        Order loadedOrder = coffeeShopSystem.getOrder(orderUri);
+        Order loadedOrder = coffeeOrderSystem.getOrder(orderUri);
         assertThat(loadedOrder).isEqualToComparingOnlyGivenFields(order, "type", "origin");
 
         loadedOrder = waitForProcessAndGet(orderUri, "PREPARING");
         assertThat(loadedOrder.getStatus()).isEqualTo("Preparing");
 
-        processorSystem.answerForId(orderUri, "FINISHED");
+        processorSystem.answerForOrder(orderUri, "FINISHED");
 
         loadedOrder = waitForProcessAndGet(orderUri, "FINISHED");
         assertThat(loadedOrder.getStatus()).isEqualTo("Finished");
     }
 
     private Order waitForProcessAndGet(URI orderUri, String requestedStatus) {
-        System.out.println("waiting for orderUri = [" + orderUri + "], requestedStatus = [" + requestedStatus + "]");
         processorSystem.waitForInvocation(orderUri, requestedStatus);
-        return coffeeShopSystem.getOrder(orderUri);
+        return coffeeOrderSystem.getOrder(orderUri);
     }
 
     @AfterEach

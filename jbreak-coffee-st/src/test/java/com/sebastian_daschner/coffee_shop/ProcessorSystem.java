@@ -1,68 +1,67 @@
 package com.sebastian_daschner.coffee_shop;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
-import com.github.tomakehurst.wiremock.matching.StringValuePattern;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.matching.ContentPattern;
 import com.github.tomakehurst.wiremock.verification.LoggedRequest;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.LockSupport;
-
-import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static java.util.Collections.singletonMap;
 
 public class ProcessorSystem {
 
     public ProcessorSystem() {
-        configureFor("coffee-processor.test.kubernetes.local", 80);
+        WireMock.configureFor("coffee-processor.test.kubernetes.local", 80);
         reset();
 
-        stubFor(post("/coffee-processor/resources/processes").willReturn(responseJson("PREPARING")));
+        WireMock.stubFor(WireMock.post("/coffee-processor/resources/processes")
+                .willReturn(responseJson("PREPARING")));
     }
 
     private ResponseDefinitionBuilder responseJson(String status) {
-        return okForJson(singletonMap("status", status));
+        return ResponseDefinitionBuilder.okForJson(Collections.singletonMap("status", status));
     }
 
-    public void answerForId(URI uri, String answer) {
-        String orderId = extractId(uri);
-        stubFor(post("/coffee-processor/resources/processes")
+    public void answerForOrder(URI orderUri, String status) {
+        String orderId = extractId(orderUri);
+        WireMock.stubFor(WireMock.post("/coffee-processor/resources/processes")
                 .withRequestBody(requestJson(orderId))
-                .willReturn(responseJson(answer)));
+                .willReturn(responseJson(status)));
     }
 
-    private String extractId(URI uri) {
-        String string = uri.toString();
+    private String extractId(URI orderUri) {
+        String string = orderUri.toString();
         return string.substring(string.lastIndexOf('/') + 1);
     }
 
-    private StringValuePattern requestJson(String id) {
-        return equalToJson("{\"order\":\"" + id + "\"}", true, true);
+    private ContentPattern<?> requestJson(String orderId) {
+        return WireMock.equalToJson("{\"order\":\"" + orderId + "\"}", true, true);
     }
 
-    private StringValuePattern requestJson(String id, String status) {
-        return equalToJson("{\"order\":\"" + id + "\",\"status\":\"" + status + "\"}", true, true);
+    private ContentPattern<?> requestJson(String orderId, String status) {
+        return WireMock.equalToJson("{\"order\":\"" + orderId + "\",\"status\":\"" + status + "\"}", true, true);
     }
 
-    public void waitForInvocation(URI orderUri, String requestedStatus) {
+    public void waitForInvocation(URI orderUri, String status) {
         long timeout = System.currentTimeMillis() + 60_000L;
-        while (!wasStatusRequested(orderUri, requestedStatus)) {
+
+        String orderId = extractId(orderUri);
+        while (!requestMatched(status, orderId)) {
             LockSupport.parkNanos(2_000_000_000L);
             if (System.currentTimeMillis() > timeout)
-                throw new AssertionError("Processing for order " + orderUri + " wasn't invoked within timeout");
+                throw new AssertionError("Invocation hasn't happened within timeout");
         }
     }
 
-    private boolean wasStatusRequested(URI orderUri, String status) {
-        String orderId = extractId(orderUri);
-        List<LoggedRequest> requests = findAll(postRequestedFor(urlEqualTo("/coffee-processor/resources/processes"))
+    private boolean requestMatched(String status, String orderId) {
+        List<LoggedRequest> requests = WireMock.findAll(WireMock.postRequestedFor(WireMock.urlEqualTo("/coffee-processor/resources/processes"))
                 .withRequestBody(requestJson(orderId, status)));
         return !requests.isEmpty();
     }
 
     public void reset() {
-        resetAllRequests();
+        WireMock.resetAllRequests();
     }
-
 }
